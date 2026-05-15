@@ -1,0 +1,12 @@
+{
+  "name": "tabs-organizer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:icons": "node scripts/generate-icons.mjs",
+    "package": "node scripts/package-extension.mjs",
+    "test": "node --test test/background.test.mjs",
+    "test:chrome": "node test/chrome-smoke.mjs"
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>tabs-organizer</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup">
+      <header class="header">
+        <div>
+          <h1>tabs-organizer</h1>
+          <p>Organize Chrome's native vertical tabs</p>
+        </div>
+      </header>
+
+      <section class="actions" aria-label="快捷操作">
+        <button id="organizeAllButton" type="button">Organize all tabs</button>
+        <button id="removeDuplicatesButton" type="button" class="secondary">
+          Remove duplicate URLs
+        </button>
+      </section>
+
+      <section class="settings" aria-label="设置">
+        <label class="toggle">
+          <input id="autoGroupEnabled" type="checkbox">
+          <span>Auto-group by domain</span>
+        </label>
+
+        <label class="toggle">
+          <input id="normalizeWww" type="checkbox">
+          <span>Normalize www.</span>
+        </label>
+
+        <label class="field">
+          <span>Group naming</span>
+          <select id="groupNameMode">
+            <option value="full-host">Full host</option>
+            <option value="registrable-domain">Registrable domain</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Excluded domains</span>
+          <textarea
+            id="excludedDomains"
+            rows="4"
+            placeholder="One domain per line, for example: example.com"
+          ></textarea>
+        </label>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
