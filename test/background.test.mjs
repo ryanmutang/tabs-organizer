@@ -29,6 +29,7 @@ test("organizeAll only groups ungrouped tabs and reuses existing domain groups",
   assert.equal(result.groupsCreated, 1);
   assert.equal(result.tabsGrouped, 3);
   assert.equal(result.tabsUngrouped, 0);
+  assert.equal(result.emptyNewTabsRemoved, 0);
   assert.deepEqual(jsonValue(chrome.calls.group), [
     { tabIds: [1, 2] },
     { tabIds: [5], groupId: 100 },
@@ -66,6 +67,43 @@ test("organizeAll ungroups tabs when their group has only one tab left", async (
   assert.equal(result.tabsGrouped, 2);
   assert.equal(result.tabsUngrouped, 1);
   assert.deepEqual(jsonValue(chrome.calls.ungroup), [[1]]);
+});
+
+test("organizeAll removes empty new tabs when a window has other tabs", async () => {
+  const chrome = createChromeMock({
+    windows: [
+      {
+        id: 1,
+        tabs: [
+          tab(1, "chrome://newtab/", 0),
+          tab(2, "edge://newtab/", 1),
+          tab(3, "https://example.com/a", 2),
+          tab(4, "https://example.com/b", 3),
+        ],
+      },
+      {
+        id: 2,
+        tabs: [
+          tab(5, "chrome://newtab/", 0),
+          tab(6, "chrome://newtab/", 1),
+        ],
+      },
+    ],
+  });
+  const context = await loadBackground(chrome);
+
+  const result = await context.organizeAllWindows();
+
+  assert.equal(result.emptyNewTabsRemoved, 3);
+  assert.deepEqual(jsonValue(chrome.calls.remove), [[1, 2], [6]]);
+  assert.deepEqual(
+    chrome.windowsData[0].tabs.map((browserTab) => browserTab.id),
+    [3, 4]
+  );
+  assert.deepEqual(
+    chrome.windowsData[1].tabs.map((browserTab) => browserTab.id),
+    [5]
+  );
 });
 
 test("removeDuplicateTabs keeps one matching address and removes later duplicates", async () => {
@@ -255,7 +293,18 @@ function createChromeMock({ windows = [], groups = [], tabsById } = {}) {
         }
       },
       async remove(tabIds) {
-        calls.remove.push(tabIds);
+        const ids = Array.isArray(tabIds) ? tabIds : [tabIds];
+        calls.remove.push(ids);
+
+        for (const tabId of ids) {
+          tabLookup.delete(tabId);
+        }
+
+        for (const browserWindow of windows) {
+          browserWindow.tabs = (browserWindow.tabs || []).filter(
+            (browserTab) => !ids.includes(browserTab.id)
+          );
+        }
       },
     },
     windows: {
@@ -263,6 +312,7 @@ function createChromeMock({ windows = [], groups = [], tabsById } = {}) {
         return windows;
       },
     },
+    windowsData: windows,
   };
 }
 

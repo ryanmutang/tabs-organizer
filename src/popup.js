@@ -56,7 +56,7 @@ async function organizeAll() {
     }
 
     setStatus(
-      `Done: created ${response.groupsCreated} groups, grouped ${response.tabsGrouped} tabs, ungrouped ${response.tabsUngrouped} singleton groups`
+      `Done: removed ${response.emptyNewTabsRemoved} empty new tabs, created ${response.groupsCreated} groups, grouped ${response.tabsGrouped} tabs, ungrouped ${response.tabsUngrouped} singleton groups`
     );
   });
 }

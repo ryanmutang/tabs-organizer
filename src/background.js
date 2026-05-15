@@ -120,8 +120,11 @@ async function organizeAllWindows() {
   let groupsCreated = 0;
   let tabsGrouped = 0;
   let tabsUngrouped = 0;
+  let emptyNewTabsRemoved = 0;
 
   for (const browserWindow of windows) {
+    emptyNewTabsRemoved += await removeEmptyNewTabs(browserWindow.tabs || []);
+
     const ungroupedByDomain = new Map();
 
     for (const tab of browserWindow.tabs || []) {
@@ -169,7 +172,7 @@ async function organizeAllWindows() {
     tabsUngrouped += await ungroupSingletonGroups(browserWindow.id);
   }
 
-  return { groupsCreated, tabsGrouped, tabsUngrouped };
+  return { groupsCreated, tabsGrouped, tabsUngrouped, emptyNewTabsRemoved };
 }
 
 async function removeDuplicateTabs() {
@@ -200,6 +203,28 @@ async function removeDuplicateTabs() {
   }
 
   return { removedTabs: duplicateTabIds.length };
+}
+
+async function removeEmptyNewTabs(tabs) {
+  const removableTabIds = tabs
+    .filter((tab) => isEmptyNewTab(tab))
+    .map((tab) => tab.id);
+
+  if (removableTabIds.length === 0) {
+    return 0;
+  }
+
+  const tabIdsToRemove =
+    removableTabIds.length === tabs.length
+      ? removableTabIds.slice(1)
+      : removableTabIds;
+
+  if (tabIdsToRemove.length === 0) {
+    return 0;
+  }
+
+  await chrome.tabs.remove(tabIdsToRemove);
+  return tabIdsToRemove.length;
 }
 
 async function findMatchingGroup(windowId, groupName) {
@@ -304,6 +329,16 @@ function getDuplicateKey(tab) {
   const rawUrl = url.href;
   const hashIndex = rawUrl.indexOf("#");
   return hashIndex >= 0 ? rawUrl.slice(0, hashIndex) : rawUrl;
+}
+
+function isEmptyNewTab(tab) {
+  const url = String(tab?.pendingUrl || tab?.url || "").toLowerCase();
+  return (
+    url === "chrome://newtab/" ||
+    url === "chrome://new-tab-page/" ||
+    url === "edge://newtab/" ||
+    url === "edge://new-tab-page/"
+  );
 }
 
 function parseHttpUrl(value) {

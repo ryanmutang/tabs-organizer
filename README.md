@@ -1,142 +1,144 @@
 # tabs-organizer
 
-tabs-organizer is a Chrome extension that enhances Chrome's native vertical tabs by organizing tabs automatically. It groups related tabs by domain, cleans up ungrouped tabs across browser windows, and removes duplicate URL tabs while keeping one copy.
+tabs-organizer 是一个 Chrome 扩展，用来配合 Chrome 原生垂直标签页整理浏览器标签。它会按域名自动分组、跨窗口整理未分组标签、删除空的新标签页，并清理重复 URL 标签，同时保留其中一个标签。
 
-The extension does not replace Chrome's tab UI. It is designed to work with Chrome's built-in vertical tabs.
+扩展不会替换 Chrome 的标签页界面，也不会实现自定义侧边栏；它专注于增强 Chrome 自带的标签管理能力。
 
-## Features
+## 功能
 
-- Automatically group tabs by domain.
-- Organize all browser windows with one click.
-- Only organize tabs that are not already in a tab group.
-- Move singleton tab groups back to regular tabs.
-- Remove duplicate URL tabs while keeping one copy.
-- Exclude domains from automatic organization.
-- Normalize `www.` hostnames.
-- Name groups by full host or registrable domain.
-- Assign stable tab group colors by domain.
+- 按域名自动分组标签页。
+- 一键整理所有浏览器窗口。
+- 一键整理时删除空的新标签页。
+- 只整理尚未加入标签组的标签页。
+- 将只剩一个标签的标签组恢复为普通标签。
+- 删除重复 URL 标签，并保留一个副本。
+- 支持配置不参与自动整理的域名。
+- 支持规范化 `www.` 主机名。
+- 支持使用完整主机名或可注册域名作为分组名称。
+- 按域名稳定分配标签组颜色。
 
-## Behavior
+## 行为说明
 
-### Automatic domain grouping
+### 自动按域名分组
 
-- Only `http://` and `https://` tabs are processed.
-- A domain group is created only when at least two matching tabs exist.
-- New tabs for an existing grouped domain are added to that group.
-- A single new domain tab remains ungrouped.
-- Tabs that are already in a tab group are not automatically regrouped.
+- 只处理 `http://` 和 `https://` 标签页。
+- 同一个域名至少有两个匹配标签时才会创建标签组。
+- 如果对应域名已经有标签组，新打开的同域名标签会加入该组。
+- 单个新域名标签会保持未分组状态。
+- 已经在标签组中的标签不会被自动重新分组。
 
-### Organize all tabs
+### 一键整理
 
-- Scans all open Chrome windows.
-- Organizes each window independently.
-- Does not move tabs across windows.
-- Only processes tabs that are not already in a tab group.
-- Groups ungrouped tabs when two or more tabs share the same domain.
-- Reuses an existing matching domain group in the same window when possible.
-- After organizing, if a tab group contains only one tab, that tab is moved out of the group and Chrome removes the empty group.
+- 扫描所有已打开的 Chrome 窗口。
+- 每个窗口独立整理，不会跨窗口移动标签页。
+- 删除空的新标签页，例如 `chrome://newtab/` 和 `edge://newtab/`。
+- 如果某个窗口只包含空的新标签页，会保留一个标签，避免关闭整个窗口。
+- 只处理尚未加入标签组的网页标签。
+- 当两个或更多标签共享同一域名时，将它们整理到同一个标签组。
+- 如果当前窗口已经存在同名域名标签组，会复用该标签组。
+- 整理完成后，如果某个标签组只剩一个标签，会将该标签移出标签组，Chrome 会自动移除空标签组。
 
-### Remove duplicate URL tabs
+### 删除重复 URL 标签
 
-- Scans regular web tabs across all Chrome windows.
-- Keeps one tab for each matching URL and closes the remaining duplicates.
-- If a URL contains `#`, only the part before `#` is used for matching.
-- If a URL does not contain `#`, the full URL is used for matching.
-- Keeps the leftmost, earliest-scanned tab by default.
+- 扫描所有 Chrome 窗口中的普通网页标签。
+- 对每个匹配 URL 保留一个标签，关闭其余重复标签。
+- 如果 URL 包含 `#`，匹配时只使用 `#` 前面的部分。
+- 如果 URL 不包含 `#`，匹配时使用完整 URL。
+- 默认保留最靠左、最早扫描到的标签。
 
-## Permissions
+## 权限说明
 
-tabs-organizer uses the following Chrome extension permissions:
+tabs-organizer 使用以下 Chrome 扩展权限：
 
-- `tabs`: reads tab URLs, window IDs, tab indexes, and group state so it can group tabs and detect duplicate URLs.
-- `tabGroups`: creates groups, reuses groups, updates group titles, and sets group colors.
-- `storage`: saves extension settings such as auto-grouping, excluded domains, and naming mode.
+- `tabs`：读取标签 URL、窗口 ID、标签位置和分组状态，用于分组、清理空新标签页和检测重复 URL。
+- `tabGroups`：创建标签组、复用标签组、更新标签组标题和设置标签组颜色。
+- `storage`：保存扩展设置，例如自动分组、排除域名和命名模式。
 
-The extension does not request host permissions, does not inject content scripts, and does not read page content.
+扩展不会请求网站访问权限，不会注入内容脚本，也不会读取网页内容。
 
-## Privacy
+## 隐私
 
-- All logic runs locally in Chrome.
-- No browsing history, tab URLs, or settings are uploaded.
-- No data is sold or shared.
-- No remote server is used.
-- Stored settings are used only for extension behavior.
+- 所有逻辑都在本地 Chrome 中运行。
+- 浏览历史、标签 URL 和设置不会被上传。
+- 不会出售或共享任何数据。
+- 不使用远程服务器。
+- 本地保存的设置仅用于扩展自身行为。
 
-## Install Locally
+## 本地安装
 
-1. Open `chrome://extensions/`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked**.
-4. Select this project directory.
-5. Click the extension icon to open the popup.
+1. 打开 `chrome://extensions/`。
+2. 启用“开发者模式”。
+3. 点击“加载已解压的扩展程序”。
+4. 选择当前项目目录。
+5. 点击扩展图标打开弹窗。
 
-## Development
+## 开发
 
-Node.js is required for tests and packaging scripts.
+测试和打包脚本需要 Node.js。
 
-Run unit tests:
+运行单元测试：
 
 ```bash
 npm test
 ```
 
-Run a Chrome smoke test with a temporary Chrome profile:
+使用临时 Chrome 用户资料运行冒烟测试：
 
 ```bash
 npm run test:chrome
 ```
 
-This command launches Chrome locally and verifies that the extension can be loaded.
+该命令会在本地启动 Chrome，并验证扩展可以被加载。
 
-## Packaging
+## 打包
 
-Generate PNG icons:
+生成 PNG 图标：
 
 ```bash
 npm run generate:icons
 ```
 
-Create the Chrome Web Store upload package:
+创建 Chrome Web Store 上传包：
 
 ```bash
 npm run package
 ```
 
-The generated zip file is:
+生成的 zip 文件为：
 
 ```text
 dist/tabs-organizer-0.1.0.zip
 ```
 
-Upload this zip file in the Chrome Web Store Developer Dashboard.
+在 Chrome Web Store 开发者后台上传该 zip 文件即可。
 
-## Release Checklist
+## 发布检查清单
 
-- Update `version` in `manifest.json`.
-- Run `npm test`.
-- Run `npm run test:chrome`.
-- Run `npm run generate:icons`.
-- Run `npm run package`.
-- Confirm the zip root contains `manifest.json`.
-- Confirm the Chrome Web Store privacy disclosures match this README.
-- Prepare screenshots, short description, full description, and category metadata.
+- 更新 `manifest.json` 中的 `version`。
+- 运行 `npm test`。
+- 运行 `npm run test:chrome`。
+- 运行 `npm run generate:icons`。
+- 运行 `npm run package`。
+- 确认 zip 根目录包含 `manifest.json`。
+- 确认 Chrome Web Store 隐私披露与本文档一致。
+- 准备截图、简短描述、完整描述和分类元数据。
 
-## Chrome Web Store Copy
+## Chrome Web Store 文案
 
-### Short description
+### 简短描述
 
-Organize Chrome tabs with automatic domain grouping and duplicate tab cleanup.
+自动按域名分组 Chrome 标签页，并清理重复标签和空的新标签页。
 
-### Full description
+### 完整描述
 
-tabs-organizer helps keep Chrome tabs organized when using Chrome's native vertical tabs. It automatically groups tabs by domain, organizes ungrouped tabs across all browser windows, removes singleton groups, and closes duplicate URL tabs while keeping one copy.
+tabs-organizer 可以在使用 Chrome 原生垂直标签页时，帮助你保持标签井然有序。它支持按域名自动分组、一键整理所有窗口中的未分组标签、移除只剩一个标签的标签组、删除空的新标签页，并关闭重复 URL 标签，同时保留一个副本。
 
-All processing happens locally in Chrome. The extension does not upload browsing data, does not inject scripts into web pages, and does not connect to remote servers.
+所有处理都在本地 Chrome 中完成。扩展不会上传浏览数据，不会向网页注入脚本，也不会连接远程服务器。
 
-## Limitations
+## 限制
 
-- Does not implement a custom sidebar tab UI.
-- Does not hide Chrome's built-in tab strip.
-- Does not merge tab groups across windows.
-- Does not support drag-and-drop sorting.
-- Does not provide cloud sync.
+- 不实现自定义侧边栏标签 UI。
+- 不隐藏 Chrome 内置标签栏。
+- 不跨窗口合并标签组。
+- 不支持拖拽排序。
+- 不提供云同步。
