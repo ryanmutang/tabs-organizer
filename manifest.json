@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "tabs-organizer",
+  "name": "Tab Organizer",
   "description": "Organize Chrome tabs with automatic domain grouping and duplicate tab cleanup.",
   "version": "0.1.0",
   "permissions": [
@@ -18,7 +18,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "tabs-organizer",
+    "default_title": "Tab Organizer",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"

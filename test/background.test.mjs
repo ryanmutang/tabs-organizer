@@ -28,7 +28,7 @@ test("organizeAll only groups ungrouped tabs and reuses existing domain groups",
 
   assert.equal(result.groupsCreated, 1);
   assert.equal(result.tabsGrouped, 3);
-  assert.equal(result.tabsUngrouped, 0);
+  assert.equal(result.tabsUngrouped, undefined);
   assert.equal(result.emptyNewTabsRemoved, 0);
   assert.deepEqual(jsonValue(chrome.calls.group), [
     { tabIds: [1, 2] },
@@ -40,7 +40,7 @@ test("organizeAll only groups ungrouped tabs and reuses existing domain groups",
   assert.equal(chrome.calls.update[0].details.title, "example.com");
 });
 
-test("organizeAll ungroups tabs when their group has only one tab left", async () => {
+test("organizeAll keeps groups that contain a single tab", async () => {
   const chrome = createChromeMock({
     windows: [
       {
@@ -65,8 +65,9 @@ test("organizeAll ungroups tabs when their group has only one tab left", async (
 
   assert.equal(result.groupsCreated, 1);
   assert.equal(result.tabsGrouped, 2);
-  assert.equal(result.tabsUngrouped, 1);
-  assert.deepEqual(jsonValue(chrome.calls.ungroup), [[1]]);
+  assert.equal(result.tabsUngrouped, undefined);
+  assert.deepEqual(jsonValue(chrome.calls.ungroup), []);
+  assert.equal(chrome.windowsData[0].tabs[0].groupId, 100);
 });
 
 test("organizeAll removes empty new tabs when a window has other tabs", async () => {
@@ -134,6 +135,40 @@ test("removeDuplicateTabs keeps one matching address and removes later duplicate
 
   assert.equal(result.removedTabs, 3);
   assert.deepEqual(jsonValue(chrome.calls.remove), [[2, 5, 7]]);
+});
+
+test("removeDuplicateTabs removes singleton groups without removing their tabs", async () => {
+  const chrome = createChromeMock({
+    windows: [
+      {
+        id: 1,
+        tabs: [
+          tab(1, "https://solo.test/", 0, 100),
+          tab(2, "https://pair.test/a", 1, 101),
+          tab(3, "https://pair.test/b", 2, 101),
+          tab(4, "https://duplicate.test/page", 3, 102),
+          tab(5, "https://duplicate.test/page", 4, 102),
+        ],
+      },
+    ],
+    groups: [
+      { id: 100, windowId: 1, title: "solo.test", color: "blue" },
+      { id: 101, windowId: 1, title: "pair.test", color: "green" },
+      { id: 102, windowId: 1, title: "duplicate.test", color: "cyan" },
+    ],
+  });
+  const context = await loadBackground(chrome);
+
+  const result = await context.removeDuplicateTabs();
+
+  assert.equal(result.removedTabs, 1);
+  assert.equal(result.singletonGroupsRemoved, 2);
+  assert.deepEqual(jsonValue(chrome.calls.remove), [[5]]);
+  assert.deepEqual(jsonValue(chrome.calls.ungroup), [[1, 4]]);
+  assert.deepEqual(
+    chrome.windowsData[0].tabs.map((browserTab) => browserTab.id),
+    [1, 2, 3, 4]
+  );
 });
 
 test("autoGroupTab leaves first domain tab ungrouped and groups the second one", async () => {

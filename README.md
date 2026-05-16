@@ -1,8 +1,8 @@
-# tabs-organizer
+# Tab Organizer
 
-tabs-organizer is a Chrome extension that enhances Chrome's native vertical tabs by organizing tabs automatically. It groups related tabs by domain, cleans up ungrouped tabs across browser windows, removes empty new tab pages, and removes duplicate URL tabs while keeping one copy.
+Tab Organizer is a Chrome extension that organizes Chrome tabs automatically, whether you use Chrome's horizontal tab strip or native vertical tabs. It groups related tabs by domain, cleans up ungrouped tabs across browser windows, removes empty new tab pages, and removes duplicate URL tabs while keeping one copy.
 
-The extension does not replace Chrome's tab UI. It is designed to work with Chrome's built-in vertical tabs.
+The extension does not replace Chrome's tab UI. It works with Chrome's built-in horizontal and vertical tab layouts.
 
 ## Features
 
@@ -10,8 +10,9 @@ The extension does not replace Chrome's tab UI. It is designed to work with Chro
 - Organize all browser windows with one click.
 - Remove empty new tab pages during one-click organization.
 - Only organize tabs that are not already in a tab group.
-- Move singleton tab groups back to regular tabs.
+- Keep existing tab groups intact during one-click organization.
 - Remove duplicate URL tabs while keeping one copy.
+- Move singleton tab groups back to regular tabs after duplicate cleanup.
 - Exclude domains from automatic organization.
 - Normalize `www.` hostnames.
 - Name groups by full host or registrable domain.
@@ -37,7 +38,7 @@ The extension does not replace Chrome's tab UI. It is designed to work with Chro
 - Only processes tabs that are not already in a tab group.
 - Groups ungrouped tabs when two or more tabs share the same domain.
 - Reuses an existing matching domain group in the same window when possible.
-- After organizing, if a tab group contains only one tab, that tab is moved out of the group and Chrome removes the empty group.
+- Existing tab groups are preserved, including groups that contain a single tab.
 
 ### Remove duplicate URL tabs
 
@@ -46,10 +47,11 @@ The extension does not replace Chrome's tab UI. It is designed to work with Chro
 - If a URL contains `#`, only the part before `#` is used for matching.
 - If a URL does not contain `#`, the full URL is used for matching.
 - Keeps the leftmost, earliest-scanned tab by default.
+- After duplicate cleanup, singleton groups are removed by moving their remaining tab back to regular tabs.
 
 ## Permissions
 
-tabs-organizer uses the following Chrome extension permissions:
+Tab Organizer uses the following Chrome extension permissions:
 
 - `tabs`: reads tab URLs, window IDs, tab indexes, and group state so it can group tabs, remove empty new tab pages, and detect duplicate URLs.
 - `tabGroups`: creates groups, reuses groups, updates group titles, and sets group colors.
@@ -108,7 +110,7 @@ npm run package
 The generated zip file is:
 
 ```text
-dist/tabs-organizer-0.1.0.zip
+dist/tab-organizer-0.1.0.zip
 ```
 
 Upload this zip file in the Chrome Web Store Developer Dashboard.
@@ -132,14 +134,14 @@ Organize Chrome tabs with automatic domain grouping, duplicate tab cleanup, and 
 
 ### Full description
 
-tabs-organizer helps keep Chrome tabs organized when using Chrome's native vertical tabs. It automatically groups tabs by domain, organizes ungrouped tabs across all browser windows, removes empty new tab pages, removes singleton groups, and closes duplicate URL tabs while keeping one copy.
+Tab Organizer helps keep Chrome tabs organized in Chrome's horizontal tab strip and native vertical tabs. It automatically groups tabs by domain, organizes ungrouped tabs across all browser windows, removes empty new tab pages, preserves existing groups during organization, and closes duplicate URL tabs while keeping one copy.
 
 All processing happens locally in Chrome. The extension does not upload browsing data, does not inject scripts into web pages, and does not connect to remote servers.
 
 ## Limitations
 
-- Does not implement a custom sidebar tab UI.
-- Does not hide Chrome's built-in tab strip.
+- Does not implement a custom sidebar or tab UI.
+- Does not replace or hide Chrome's built-in tab layouts.
 - Does not merge tab groups across windows.
 - Does not support drag-and-drop sorting.
 - Does not provide cloud sync.

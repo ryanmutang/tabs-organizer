@@ -119,7 +119,6 @@ async function organizeAllWindows() {
   const windows = await chrome.windows.getAll({ populate: true });
   let groupsCreated = 0;
   let tabsGrouped = 0;
-  let tabsUngrouped = 0;
   let emptyNewTabsRemoved = 0;
 
   for (const browserWindow of windows) {
@@ -168,11 +167,9 @@ async function organizeAllWindows() {
 
       tabsGrouped += tabIds.length;
     }
-
-    tabsUngrouped += await ungroupSingletonGroups(browserWindow.id);
   }
 
-  return { groupsCreated, tabsGrouped, tabsUngrouped, emptyNewTabsRemoved };
+  return { groupsCreated, tabsGrouped, emptyNewTabsRemoved };
 }
 
 async function removeDuplicateTabs() {
@@ -202,7 +199,16 @@ async function removeDuplicateTabs() {
     await chrome.tabs.remove(duplicateTabIds);
   }
 
-  return { removedTabs: duplicateTabIds.length };
+  let singletonGroupsRemoved = 0;
+
+  for (const browserWindow of windows) {
+    singletonGroupsRemoved += await ungroupSingletonGroups(browserWindow.id);
+  }
+
+  return {
+    removedTabs: duplicateTabIds.length,
+    singletonGroupsRemoved,
+  };
 }
 
 async function removeEmptyNewTabs(tabs) {

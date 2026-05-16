@@ -56,7 +56,7 @@ async function organizeAll() {
     }
 
     setStatus(
-      `Done: removed ${response.emptyNewTabsRemoved} empty new tabs, created ${response.groupsCreated} groups, grouped ${response.tabsGrouped} tabs, ungrouped ${response.tabsUngrouped} singleton groups`
+      `Done: removed ${response.emptyNewTabsRemoved} empty new tabs, created ${response.groupsCreated} groups, grouped ${response.tabsGrouped} tabs`
     );
   });
 }
@@ -72,7 +72,9 @@ async function removeDuplicates() {
         throw new Error(response.error);
       }
 
-      setStatus(`Removed ${response.removedTabs} duplicate tabs`);
+      setStatus(
+        `Removed ${response.removedTabs} duplicate tabs, removed ${response.singletonGroupsRemoved} singleton groups`
+      );
     }
   );
 }
